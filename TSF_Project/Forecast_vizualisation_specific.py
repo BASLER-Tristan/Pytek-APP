@@ -1,22 +1,13 @@
 import pandas as pd
-from reflect import autorun
-from reflect_antd import Input, Space, Typography
+import plotly.express as px
+from reflect_antd import DatePicker, InputNumber, Select, Space
 from reflect_html import *
-from reflect_antd import Select
-from reflect import js
-import plotly.express as px
-from reflect import autorun
 from reflect_plotly import Graph
-import plotly.express as px
-from reflect_antd import InputNumber
-from reflect_antd import DatePicker
 
 Option = Select.Option
-import itertools
-import os
-from datetime import datetime
-from TSF_Project.database.Forecasting import *
+
 from TSF_Project.database.datacreation import list_database
+from TSF_Project.database.Forecasting import *
 
 ################### APP
 
