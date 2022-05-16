@@ -1,22 +1,16 @@
 # AR example
-from pyexpat import model
 import pandas as pd
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.vector_ar.var_model import VAR
-from statsmodels.tsa.statespace.varmax import VARMAX
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import numpy as np
 
-# data=pd.read_csv('reflect\\TSF_Project\\database\\data.csv')
-# data.set_index(pd.to_datetime(data['Unnamed: 0']),inplace=True)
-# data.drop(columns='Unnamed: 0',inplace=True)
 
-
-# AR
 def AR_predict(data, date, N):
+    """Auto regressive"""
     cols = []
     col_name = []
     metrics = []
@@ -48,8 +42,8 @@ def AR_predict(data, date, N):
     return data, dff, dffm
 
 
-# MA
 def MA_predict(data, date, N):
+    "Moving average"
     cols = []
     col_name = []
     metrics = []
@@ -84,8 +78,8 @@ def MA_predict(data, date, N):
     return data, dff, dffm
 
 
-# ARMA
 def ARMA_predict(data, date, N):
+    """ARMA"""
     cols = []
     col_name = []
     metrics = []
@@ -120,8 +114,8 @@ def ARMA_predict(data, date, N):
     return data, dff, dffm
 
 
-# ARIMA
 def ARIMA_predict(data, date, N):
+    """ARIMA"""
     cols = []
     col_name = []
     metrics = []
@@ -156,8 +150,8 @@ def ARIMA_predict(data, date, N):
     return data, dff, dffm
 
 
-# SARIMA
 def SARIMA_predict(data, date, N):
+    """SARIMA"""
     cols = []
     col_name = []
     metrics = []
@@ -192,8 +186,8 @@ def SARIMA_predict(data, date, N):
     return data, dff, dffm
 
 
-# VAR
 def VAR_predict(data, date, N):
+    """VAR"""
     data_train = data[data.index < date]
     model = VAR(data_train)
     date_f = date + pd.DateOffset(months=N)
@@ -215,8 +209,8 @@ def VAR_predict(data, date, N):
     return data, dff, dffm
 
 
-# SES
 def SES_predict(data, date, N):
+    """SES"""
     cols = []
     col_name = []
     metrics = []
@@ -251,8 +245,8 @@ def SES_predict(data, date, N):
     return data, dff, dffm
 
 
-# HWES
 def HWES_predict(data, date, N):
+    """HWES"""
     cols = []
     col_name = []
     metrics = []

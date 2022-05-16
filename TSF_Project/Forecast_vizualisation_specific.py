@@ -15,17 +15,17 @@ DATA_FOLDER = "database"
 
 class Application:
     def __init__(self):
-        list_database = [
-            name for name in os.listdir(DATA_FOLDER) if name.endswith(".csv")
+        samples = [
+            name[:-len(".csv")] for name in os.listdir(DATA_FOLDER) if name.endswith(".csv")
         ]
         self.model = Select(
-            children=[Option(key, key=key) for key in (MODELS)],
+            children=[Option(method.__doc__, key=key) for key, method in MODELS.items()],
             allowClear=True,
             style=dict(width="100%"),
             placeholder="Please select your model",
         )
         self.database = Select(
-            children=[Option(key, key=key) for key in (list_database)],
+            children=[Option(key, key=key) for key in (samples)],
             allowClear=True,
             style=dict(width="100%"),
             placeholder="Please select your dataset",
@@ -36,7 +36,7 @@ class Application:
     def graph(self):
         if not all((self.model(), self.database(), self.date(), self.input_number())):
             return
-        data = pd.read_csv(os.path.join(DATA_FOLDER, self.database()))
+        data = pd.read_csv(os.path.join(DATA_FOLDER, self.database() + ".csv"))
         data.set_index(pd.to_datetime(data["Unnamed: 0"]), inplace=True)
         data.drop(columns="Unnamed: 0", inplace=True)
         date = pd.to_datetime(self.date())
