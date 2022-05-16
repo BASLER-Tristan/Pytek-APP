@@ -1,13 +1,13 @@
+########################## Data Creation ##########################
+
 import random
 import numpy as np
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 import string
+from pathlib import Path
 
-list_database = [
-    "TSF_Project\\database\\data.csv",
-]
-########################## Data Creation ##########################
+
 if __name__ == "__main__":
     N = 10
     K = 10
@@ -38,4 +38,4 @@ if __name__ == "__main__":
             list_product.append(x)
     data.columns = list_product
 
-    data.to_csv("D:\\Python_Project\\reflect\\TSF_Project\\database\\data.csv")
+    data.to_csv(Path("database/data.csv"))

@@ -1,4 +1,5 @@
 # AR example
+from pyexpat import model
 import pandas as pd
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
@@ -12,44 +13,6 @@ import numpy as np
 # data=pd.read_csv('reflect\\TSF_Project\\database\\data.csv')
 # data.set_index(pd.to_datetime(data['Unnamed: 0']),inplace=True)
 # data.drop(columns='Unnamed: 0',inplace=True)
-
-support_type = [
-    "AR",
-    "MA",
-    "ARMA",
-    "ARIMA",
-    "SARIMA",
-    "SARIMAX",
-    "VAR",
-    "SES",
-    "HWES",
-]
-
-
-class predictor:
-    def __init__(self, type):
-        if not (type is support_type):
-            assert "Not support type for the moment"
-        self.type = type
-
-    def predict(self, data, date, N):
-        if self.type == "AR":
-            data, dff, dffm = AR_predict(data, date, N)
-        elif self.type == "MA":
-            data, dff, dffm = MA_predict(data, date, N)
-        elif self.type == "ARMA":
-            data, dff, dffm = ARMA_predict(data, date, N)
-        elif self.type == "ARIMA":
-            data, dff, dffm = ARIMA_predict(data, date, N)
-        elif self.type == "SARIMA":
-            data, dff, dffm = SARIMA_predict(data, date, N)
-        elif self.type == "VAR":
-            data, dff, dffm = VAR_predict(data, date, N)
-        elif self.type == "SES":
-            data, dff, dffm = SES_predict(data, date, N)
-        elif self.type == "HWES":
-            data, dff, dffm = HWES_predict(data, date, N)
-        return data, dff, dffm
 
 
 # AR
@@ -323,3 +286,10 @@ def HWES_predict(data, date, N):
     dffm = pd.DataFrame(metrics, columns=col_name_metrics, index=index)
     data = data[data.index < date_f]
     return data, dff, dffm
+
+
+MODELS = {
+    name[: -(len("_predict"))]: value
+    for name, value in globals().items()
+    if name.endswith("_predict")
+}
