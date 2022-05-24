@@ -4,56 +4,13 @@ from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 from statsmodels.tsa.vector_ar.var_model import VAR
-from statsmodels.tsa.statespace.varmax import VARMAX
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import numpy as np
 
-# data=pd.read_csv('reflect\\TSF_Project\\database\\data.csv')
-# data.set_index(pd.to_datetime(data['Unnamed: 0']),inplace=True)
-# data.drop(columns='Unnamed: 0',inplace=True)
 
-support_type = [
-    "AR",
-    "MA",
-    "ARMA",
-    "ARIMA",
-    "SARIMA",
-    "SARIMAX",
-    "VAR",
-    "SES",
-    "HWES",
-]
-
-
-class predictor:
-    def __init__(self, type):
-        if not (type is support_type):
-            assert "Not support type for the moment"
-        self.type = type
-
-    def predict(self, data, date, N):
-        if self.type == "AR":
-            data, dff, dffm = AR_predict(data, date, N)
-        elif self.type == "MA":
-            data, dff, dffm = MA_predict(data, date, N)
-        elif self.type == "ARMA":
-            data, dff, dffm = ARMA_predict(data, date, N)
-        elif self.type == "ARIMA":
-            data, dff, dffm = ARIMA_predict(data, date, N)
-        elif self.type == "SARIMA":
-            data, dff, dffm = SARIMA_predict(data, date, N)
-        elif self.type == "VAR":
-            data, dff, dffm = VAR_predict(data, date, N)
-        elif self.type == "SES":
-            data, dff, dffm = SES_predict(data, date, N)
-        elif self.type == "HWES":
-            data, dff, dffm = HWES_predict(data, date, N)
-        return data, dff, dffm
-
-
-# AR
 def AR_predict(data, date, N):
+    """Auto regressive"""
     cols = []
     col_name = []
     metrics = []
@@ -81,12 +38,11 @@ def AR_predict(data, date, N):
     metrics = np.transpose(metrics)
     index = pd.date_range(date, periods=metrics.shape[0], freq="MS")
     dffm = pd.DataFrame(metrics, columns=col_name_metrics, index=index)
-    data = data[data.index <= date_f]
+    data = data[data.index < date_f]
     return data, dff, dffm
 
-
-# MA
 def MA_predict(data, date, N):
+    "Moving average"
     cols = []
     col_name = []
     metrics = []
@@ -108,7 +64,7 @@ def MA_predict(data, date, N):
         col_name.append(str(col) + "_MA")
         y = yhat[: len(test)]
         metrics.append(np.sqrt((np.array(test) - np.array(y)) ** 2))
-        col_name_metrics.append(str(col) + "_error_AR")
+        col_name_metrics.append(str(col) + "_error_MA")
 
     index = pd.date_range(date, periods=N, freq="MS")
     cols = np.transpose(cols)
@@ -120,9 +76,8 @@ def MA_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
-
-# ARMA
 def ARMA_predict(data, date, N):
+    """Autoregressive–moving-average model"""
     cols = []
     col_name = []
     metrics = []
@@ -144,7 +99,7 @@ def ARMA_predict(data, date, N):
         col_name.append(str(col) + "_ARMA")
         y = yhat[: len(test)]
         metrics.append(np.sqrt((np.array(test) - np.array(y)) ** 2))
-        col_name_metrics.append(str(col) + "_error_AR")
+        col_name_metrics.append(str(col) + "_error_ARMA")
 
     index = pd.date_range(date, periods=N, freq="MS")
     cols = np.transpose(cols)
@@ -156,9 +111,8 @@ def ARMA_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
-
-# ARIMA
 def ARIMA_predict(data, date, N):
+    "Autoregressive Integrated Moving Average"
     cols = []
     col_name = []
     metrics = []
@@ -177,7 +131,7 @@ def ARIMA_predict(data, date, N):
             end=len(train) + N - 1,
         )
         cols.append(yhat)
-        col_name.append(str(col) + "_ARiMA")
+        col_name.append(str(col) + "_ARIMA")
         y = yhat[: len(test)]
         metrics.append(np.sqrt((np.array(test) - np.array(y)) ** 2))
         col_name_metrics.append(str(col) + "_error_ARIMA")
@@ -192,9 +146,8 @@ def ARIMA_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
-
-# SARIMA
 def SARIMA_predict(data, date, N):
+    "Seasonal Autoregressive Integrated Moving Average"
     cols = []
     col_name = []
     metrics = []
@@ -228,9 +181,8 @@ def SARIMA_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
-
-# VAR
 def VAR_predict(data, date, N):
+    "Vector Autoregression"
     data_train = data[data.index < date]
     model = VAR(data_train)
     date_f = date + pd.DateOffset(months=N)
@@ -251,9 +203,8 @@ def VAR_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
-
-# SES
 def SES_predict(data, date, N):
+    "Simple Exponential Smoothing"
     cols = []
     col_name = []
     metrics = []
@@ -272,10 +223,10 @@ def SES_predict(data, date, N):
             train = train.append(yhat)
             col_values.append(float(yhat))
         cols.append(yhat)
-        col_name.append(str(col) + "_AR")
+        col_name.append(str(col) + "_SES")
         y = yhat[: len(test)]
         metrics.append(np.sqrt((np.array(test) - np.array(y)) ** 2))
-        col_name_metrics.append(str(col) + "_error_AR")
+        col_name_metrics.append(str(col) + "_error_SES")
 
     index = pd.date_range(date, periods=N, freq="MS")
     cols = np.transpose(cols)
@@ -287,9 +238,8 @@ def SES_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
-
-# HWES
 def HWES_predict(data, date, N):
+    "Holt Winter’s Exponential Smoothing"
     cols = []
     col_name = []
     metrics = []
@@ -323,3 +273,9 @@ def HWES_predict(data, date, N):
     dffm = pd.DataFrame(metrics, columns=col_name_metrics, index=index)
     data = data[data.index < date_f]
     return data, dff, dffm
+
+MODELS = {
+    name[: -(len("_predict"))]: value
+    for name, value in globals().items()
+    if name.endswith("_predict")
+}
