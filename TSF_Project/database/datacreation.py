@@ -1,9 +1,25 @@
+##################################################################################
+"""
+This script contains the creation of the dataset
+Running the script creates four dataset :
+ - data_R, created by the numpy random function
+ - data_WN, created by a white noise
+ - data_WYI, created by a sequence between 0 and K modulated by a white noise
+ - data_YI, created by yearly sequence increased by 20% each year and modulated by a white noise
+
+N is the number of product
+K is the number of month to generate. The first month is always January 2010.
+"""
+##################################################################################
+
+### Importation
 import random
 import numpy as np
 import pandas as pd
 from statsmodels.tsa.arima.model import ARIMA
 import string
 
+### Object definition
 list_database = [
     "TSF_Project\\database\\data_R.csv",
     "TSF_Project\\database\\data_WN.csv",
@@ -28,26 +44,26 @@ data_R.set_index(pd.to_datetime(data_R['Unnamed: 0']),inplace=True)
 data_R.drop(columns='Unnamed: 0',inplace=True)
 
 database_explanation={}
-database_explanation["data_YI"]=("The dataset translates the sales of ten different products, {} " \
-                                                  "between january 2010 and december 2019. \n"
-                                               "The monthly purchase has been created by a white noise for every"
-                                                   "year with a mean value for the first year and inscrease by 120% each year"
-                                                  "and a standard deviation of 4.".format(" ,".join(data_YI.columns)))
-database_explanation["data_WYI"]=("The dataset translates the sales of ten different products, {} " \
-                                                  "between january 2010 and december 2019. \n"
-                                               "The monthly purchase has been created by a white noise for every"
-                                                   "year with a mean value for the first year and inscrease by 120% each year"
-                                                  "and a standard deviation of 4.".format(" ,".join(data_WYI.columns)))
-database_explanation["data_WN"]=("The dataset translates the sales of ten different products, {} " \
-                                                  "between january 2010 and december 2019. \n"
-                                               "The monthly purchase has been created by a white noise for every"
-                                                   "year with a mean value for the first year and inscrease by 120% each year"
-                                                  "and a standard deviation of 4.".format(" ,".join(data_WN.columns)))
-database_explanation["data_R"]=("The dataset translates the sales of ten different products, {} " \
-                                                  "between january 2010 and december 2019. \n"
-                                               "The monthly purchase has been created by a white noise for every"
-                                                   "year with a mean value for the first year and inscrease by 120% each year"
-                                                  "and a standard deviation of 4.".format(" ,".join(data_R.columns)))
+database_explanation["data_YI"]=("""
+The dataset translates the sales of ten different products, {} between january 2010 and december 2019. \n
+The monthly purchase has been created by a white noise for every year with a mean value for the first year and inscrease by 20% each year and a standard deviation of 4.
+""".format(" ,".join(data_YI.columns)))
+
+database_explanation["data_WYI"]=("""
+The dataset translates the sales of ten different products, {} between january 2010 and december 2019. \n
+The monthly purchase has been created by a sequence from one to 120 modulated by a white noise with a standard deviation of 4.
+""".format(" ,".join(data_WYI.columns)))
+
+database_explanation["data_WN"]=("""
+The dataset translates the sales of ten different products, {} between january 2010 and december 2019. \n   
+The monthly purchase has been created by a white noise with a standard deviation of 4.
+""".format(" ,".join(data_WN.columns)))
+
+database_explanation["data_R"]=("""
+The dataset translates the sales of ten different products, {} between january 2010 and december 2019. \n 
+The monthly purchase has been created by the numpy random function.
+""".format(" ,".join(data_R.columns)))
+
 data_columns={}
 data_columns['data_R']=data_R.columns
 data_columns['data_WYI']=data_WYI.columns

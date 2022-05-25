@@ -1,4 +1,26 @@
-# AR example
+##################################################################################
+"""
+This script is the implementation on your dataset of 8 classic ways to forecast time series.
+
+You can find the model :
+    * AR : Autoregression,
+    * MA : Moving Average,
+    * ARMA : Autoregressive Moving Average,
+    * ARIMA : Autoregressive Integrated Moving Average,
+    * SARIMA : Seasonal Autoregressive Integrated Moving - Average,
+    * VAR : Vector Autoregression,
+    * VARMA : Vector Autoregression Moving-Average,
+    * SES : Simple Exponential Smoothing,"
+    * HWES : Holt Winter’s Exponential Smoothing,
+
+The result of each function are :
+    - data, the dataframe with the true value of each product reduced if needed to the studied time
+    - dff, the dataframe with the predicted value for each product
+    - dffm the Absolute Percent Error for every month and every product
+"""
+##################################################################################
+
+### Importation
 import pandas as pd
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
@@ -8,7 +30,7 @@ from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import numpy as np
 
-
+### Model Predict definition
 def AR_predict(data, date, N):
     """Auto regressive"""
     cols = []
@@ -196,7 +218,7 @@ def VAR_predict(data, date, N):
     for col in data.columns:
         col_name.append(str(col) + "_VAR")
     dff = pd.DataFrame(yhat, columns=col_name, index=index)
-    dffm = (np.array(data_test) - np.array(y)) ** 2
+    dffm = (np.array(data_test) - np.array(yhat)) ** 2
     dffm = pd.DataFrame(dffm)
     dffm.index = data_test.index
     dffm.columns = [col + "_error_VAR" for col in data_test.columns]
@@ -222,7 +244,7 @@ def SES_predict(data, date, N):
             yhat = model_fit.predict(start=len(train), end=len(train))
             train = train.append(yhat)
             col_values.append(float(yhat))
-        cols.append(yhat)
+        cols.append(col_values)
         col_name.append(str(col) + "_SES")
         y = yhat[: len(test)]
         metrics.append(np.sqrt((np.array(test) - np.array(y)) ** 2))
@@ -258,7 +280,7 @@ def HWES_predict(data, date, N):
             yhat = model_fit.predict(start=len(train), end=len(train))
             train = train.append(yhat)
             col_values.append(float(yhat))
-        cols.append(yhat)
+        cols.append(col_values)
         col_name.append(str(col) + "_HWES")
         y = yhat[: len(test)]
         metrics.append(np.sqrt((np.array(test) - np.array(y)) ** 2))
@@ -274,6 +296,7 @@ def HWES_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
+### Vectorization
 MODELS = {
     name[: -(len("_predict"))]: value
     for name, value in globals().items()

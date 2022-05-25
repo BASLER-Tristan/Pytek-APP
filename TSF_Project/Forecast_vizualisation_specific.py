@@ -1,3 +1,12 @@
+##################################################################################
+"""
+
+
+
+"""
+##################################################################################
+
+### Importation
 import pandas as pd
 from reflect_antd import Input, Space, Typography, Select, InputNumber, DatePicker, Divider, Card, Button
 from reflect_html import *
@@ -17,7 +26,7 @@ Title, Paragraph, Text, Link = (
 )
 Option = Select.Option
 
-################### APP
+################### APP ###################
 DATA_FOLDER = "TSF_Project/database"
 link = 'https://machinelearningmastery.com/time-series-forecasting-methods-in-python-cheat-sheet/'
 
@@ -77,9 +86,6 @@ class Application:
             """),
             Paragraph("""
             * SARIMA : Seasonal Autoregressive Integrated Moving - Average,
-            """),
-            Paragraph("""
-            * SARIMAX : Seasonal Autoregressive Integrated Moving - Average with Exogenous Regressors 
             """),
             Paragraph("""
             * VAR : Vector Autoregression,
@@ -169,7 +175,7 @@ class Application:
                 ]
             )
 
-    def unique_graph(self):
+    def specific_graph(self):
         if not all((self.model(), self.database(), self.date(), self.input_number(),self.col_option())):
             return
         else:
@@ -236,7 +242,7 @@ def app():
             Space([application.date, application.input_number]),
             Space([application.generic_graph]),
             Space([application.col_option]),
-            Space([application.unique_graph]),
+            Space([application.specific_graph]),
 
         ]
     )
