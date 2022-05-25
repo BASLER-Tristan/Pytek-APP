@@ -12,63 +12,31 @@ K is the number of month to generate. The first month is always January 2010.
 """
 ##################################################################################
 
-### Importation
 import random
 import numpy as np
 import pandas as pd
-from statsmodels.tsa.arima.model import ARIMA
 import string
+from os.path import join
 
-### Object definition
-list_database = [
-    "TSF_Project\\database\\data_R.csv",
-    "TSF_Project\\database\\data_WN.csv",
-    "TSF_Project\\database\\data_WYI.csv",
-    "TSF_Project\\database\\data_YI.csv",
-]
 
-data_YI = pd.read_csv('TSF_Project\\database\\data_YI.csv')
-data_YI.set_index(pd.to_datetime(data_YI['Unnamed: 0']),inplace=True)
-data_YI.drop(columns='Unnamed: 0',inplace=True)
+database_explanation = {
+    "data_YI": "a white noise for every year with a mean value for the first year and increase by 20% each year and a standard deviation of 4",
+    "data_WYI": "a sequence from one to 120 modulated by a white noise with a standard deviation of 4",
+    "data_WN": "a white noise with a standard deviation of 4",
+    "data_R": "the numpy random function",
+}
 
-data_WN = pd.read_csv('TSF_Project\\database\\data_WN.csv')
-data_WN.set_index(pd.to_datetime(data_WN['Unnamed: 0']),inplace=True)
-data_WN.drop(columns='Unnamed: 0',inplace=True)
+data_columns = {}
+for name, description in database_explanation.items():
+    data = pd.read_csv(join("TSF_Project", "database", f"{name}.csv"))
+    data.set_index(pd.to_datetime(data["Unnamed: 0"]), inplace=True)
+    data.drop(columns="Unnamed: 0", inplace=True)
+    data_columns[name] = data.columns
 
-data_WYI = pd.read_csv('TSF_Project\\database\\data_WYI.csv')
-data_WYI.set_index(pd.to_datetime(data_WYI['Unnamed: 0']),inplace=True)
-data_WYI.drop(columns='Unnamed: 0',inplace=True)
 
-data_R = pd.read_csv('TSF_Project\\database\\data_R.csv')
-data_R.set_index(pd.to_datetime(data_R['Unnamed: 0']),inplace=True)
-data_R.drop(columns='Unnamed: 0',inplace=True)
+def save_data(data, name):
+    data.to_csv(join("TSF_Project", "database", f"data_{name}.csv"))
 
-database_explanation={}
-database_explanation["data_YI"]=("""
-The dataset translates the sales of ten different products, {} between january 2010 and december 2019. \n
-The monthly purchase has been created by a white noise for every year with a mean value for the first year and inscrease by 20% each year and a standard deviation of 4.
-""".format(" ,".join(data_YI.columns)))
-
-database_explanation["data_WYI"]=("""
-The dataset translates the sales of ten different products, {} between january 2010 and december 2019. \n
-The monthly purchase has been created by a sequence from one to 120 modulated by a white noise with a standard deviation of 4.
-""".format(" ,".join(data_WYI.columns)))
-
-database_explanation["data_WN"]=("""
-The dataset translates the sales of ten different products, {} between january 2010 and december 2019. \n   
-The monthly purchase has been created by a white noise with a standard deviation of 4.
-""".format(" ,".join(data_WN.columns)))
-
-database_explanation["data_R"]=("""
-The dataset translates the sales of ten different products, {} between january 2010 and december 2019. \n 
-The monthly purchase has been created by the numpy random function.
-""".format(" ,".join(data_R.columns)))
-
-data_columns={}
-data_columns['data_R']=data_R.columns
-data_columns['data_WYI']=data_WYI.columns
-data_columns['data_WN']=data_WN.columns
-data_columns['data_YI']=data_YI.columns
 
 ########################## Data Creation ##########################
 if __name__ == "__main__":
@@ -102,7 +70,7 @@ if __name__ == "__main__":
             list_product.append(x)
     data.columns = list_product
 
-    data.to_csv("D:\\Python_Project\\reflect\\TSF_Project\\database\\data_YI.csv")
+    save_data(data, "YI")
 
     ### Creation of the data without yearly increased
     N = 10
@@ -112,8 +80,8 @@ if __name__ == "__main__":
         mean = random.randint(10, 50)
         std = 4
         samples = np.random.normal(mean, std, size=12 * K)
-        row = np.array([i for i in range(K*12)])
-        row= row + samples
+        row = np.array([i for i in range(K * 12)])
+        row = row + samples
         data.append(row)
 
     cols = np.transpose(data)
@@ -132,7 +100,7 @@ if __name__ == "__main__":
             list_product.append(x)
     data.columns = list_product
 
-    data.to_csv("D:\\Python_Project\\reflect\\TSF_Project\\database\\data_WYI.csv")
+    save_data(data, "WYI")
 
     ### Creation of the white noise data
     N = 10
@@ -160,7 +128,7 @@ if __name__ == "__main__":
             list_product.append(x)
     data.columns = list_product
 
-    data.to_csv("D:\\Python_Project\\reflect\\TSF_Project\\database\\data_WN.csv")
+    save_data(data, "WN")
 
     ### Creation of the white noise data
     N = 10
@@ -186,5 +154,4 @@ if __name__ == "__main__":
             list_product.append(x)
     data.columns = list_product
 
-    data.to_csv("D:\\Python_Project\\reflect\\TSF_Project\\database\\data_R.csv")
-
+    save_data(data, "R")

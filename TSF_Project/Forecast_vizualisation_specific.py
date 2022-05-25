@@ -8,13 +8,21 @@
 
 ### Importation
 import pandas as pd
-from reflect_antd import Input, Space, Typography, Select, InputNumber, DatePicker, Divider, Card, Button
+from reflect_antd import (
+    Space,
+    Typography,
+    Select,
+    InputNumber,
+    DatePicker,
+    Card,
+    Button,
+)
 from reflect_html import *
 from reflect_plotly import Graph
 import plotly.express as px
 from datetime import datetime
 from TSF_Project.database.Forecasting import MODELS
-from TSF_Project.database.datacreation import list_database, database_explanation, data_columns
+from TSF_Project.database.datacreation import database_explanation, data_columns
 import os
 import numpy as np
 
@@ -28,12 +36,15 @@ Option = Select.Option
 
 ################### APP ###################
 DATA_FOLDER = "TSF_Project/database"
-link = 'https://machinelearningmastery.com/time-series-forecasting-methods-in-python-cheat-sheet/'
+link = "https://machinelearningmastery.com/time-series-forecasting-methods-in-python-cheat-sheet/"
+
 
 class Application:
     def __init__(self):
         samples = [
-            name[:-len(".csv")] for name in os.listdir(DATA_FOLDER) if name.endswith(".csv")
+            name[: -len(".csv")]
+            for name in os.listdir(DATA_FOLDER)
+            if name.endswith(".csv")
         ]
         self.database = Select(
             children=[Option(key, key=key) for key in (samples)],
@@ -43,7 +54,9 @@ class Application:
         )
 
         self.model = Select(
-            children=[Option(method.__doc__, key=key) for key, method in MODELS.items()],
+            children=[
+                Option(method.__doc__, key=key) for key, method in MODELS.items()
+            ],
             allowClear=True,
             style=dict(width="100%"),
             placeholder="Please select your model",
@@ -51,17 +64,15 @@ class Application:
         self.date = DatePicker(picker="month")
         self.input_number = InputNumber(min=1)
 
-
-        self.col_option=Select(
-            children=[Option(key, key=key)
-            for key in data_columns['data_WN']],
+        self.col_option = Select(
+            children=[Option(key, key=key) for key in data_columns["data_WN"]],
             allowClear=True,
             style=dict(width="100%"),
             placeholder="Please select your product",
-            )
+        )
 
     def explanation(self):
-        explanation_princip=[
+        explanation_princip = [
             Title("Method Explanation"),
             Paragraph(
                 "The goal of this app is to study the result ot several method of time series Forecasting on different databases."
@@ -69,60 +80,86 @@ class Application:
         ]
         explanation_model = [
             Title("Model Explanation"),
-            Paragraph("""
+            Paragraph(
+                """
                 You can find several models in the dropdown menu : 
-                """),
-            Paragraph("""
+                """
+            ),
+            Paragraph(
+                """
             * AR : Autoregression,
-            """),
-            Paragraph("""
+            """
+            ),
+            Paragraph(
+                """
             * MA : Moving Average,
-            """),
-            Paragraph("""
+            """
+            ),
+            Paragraph(
+                """
             * ARMA : Autoregressive Moving Average,
-            """),
-            Paragraph("""
+            """
+            ),
+            Paragraph(
+                """
             * ARIMA : Autoregressive Integrated Moving Average,
-            """),
-            Paragraph("""
+            """
+            ),
+            Paragraph(
+                """
             * SARIMA : Seasonal Autoregressive Integrated Moving - Average,
-            """),
-            Paragraph("""
+            """
+            ),
+            Paragraph(
+                """
             * VAR : Vector Autoregression,
-            """),
-            Paragraph("""
+            """
+            ),
+            Paragraph(
+                """
             * VARMA : Vector Autoregression Moving-Average,
-            """),
-            Paragraph("""
+            """
+            ),
+            Paragraph(
+                """
             * SES : Simple Exponential Smoothing,
-            """),
-            Paragraph("""
+            """
+            ),
+            Paragraph(
+                """
             * HWES : Holt Winter’s Exponential Smoothing,
-            """),
-
+            """
+            ),
         ]
         if not self.database():
-            return div([
-                Typography(explanation_princip),
-                Typography(explanation_model),
-                Space([Button("Link to the article", type="link")]),
-                ])
-        else :
+            return div(
+                [
+                    Typography(explanation_princip),
+                    Typography(explanation_model),
+                    Space([Button("Link to the article", type="link")]),
+                ]
+            )
+        else:
             data = pd.read_csv(os.path.join(DATA_FOLDER, self.database() + ".csv"))
             data.set_index(pd.to_datetime(data["Unnamed: 0"]), inplace=True)
             data.drop(columns="Unnamed: 0", inplace=True)
             explanation_database = [
                 Title("Database Explanation"),
                 Paragraph(
-                    database_explanation[self.database()]
+                    [
+                        "The dataset translates the sales of ten different products, between january 2010 and december 2019. ",
+                        f"The monthly purchase has been created by {database_explanation[self.database()]}",
+                    ]
                 ),
             ]
-            return div([
-                Typography(explanation_princip),
-                Typography(explanation_model),
-                Space([Button("Link to the article", type="link")]),
-                Typography(explanation_database),
-            ])
+            return div(
+                [
+                    Typography(explanation_princip),
+                    Typography(explanation_model),
+                    Space([Button("Link to the article", type="link")]),
+                    Typography(explanation_database),
+                ]
+            )
 
     def generic_graph(self):
         if not all((self.model(), self.database(), self.date(), self.input_number())):
@@ -137,26 +174,28 @@ class Application:
 
             N = int(self.input_number())
             data, dff, dffm = MODELS[self.model()](data, date, int(self.input_number()))
-            y_true=data.sum(axis=1)
-            y_pred=dff.sum(axis=1)
+            y_true = data.sum(axis=1)
+            y_pred = dff.sum(axis=1)
 
             y_true.index.name = None
 
-            df = pd.concat([y_true,y_pred],axis=1)
-            df.columns=['Total Purchase','Total Predicted']
-            fig = px.line(df,
-                          y=['Total Purchase','Total Predicted'])
+            df = pd.concat([y_true, y_pred], axis=1)
+            df.columns = ["Total Purchase", "Total Predicted"]
+            fig = px.line(df, y=["Total Purchase", "Total Predicted"])
             fig.update_layout(
                 title="Evolution of the total purchase",
                 xaxis_title="Date",
                 yaxis_title="Purchase",
             )
 
-            test_index=pd.date_range(date,periods=N,freq="MS")
+            test_index = pd.date_range(date, periods=N, freq="MS")
             test_index = test_index[test_index <= y_true.index.max()]
             test_index.freq = None
             test_index = pd.DatetimeIndex(test_index)
-            diff=abs(y_pred.loc[test_index]-y_true.loc[test_index])/y_true.loc[test_index]
+            diff = (
+                abs(y_pred.loc[test_index] - y_true.loc[test_index])
+                / y_true.loc[test_index]
+            )
             fig_error = px.bar(diff)
             fig_error.update_layout(
                 title="Evolution of the absolute percent error",
@@ -167,16 +206,33 @@ class Application:
                 [
                     Space(Graph(fig)),
                     Space(Graph(fig_error)),
-                    Space([Card(np.round(y_true.loc[test_index].sum()), title="Total Purchase on the overlap time values",
-                             extra=a(href=True)),
-                        Card(np.round(y_pred.loc[test_index].sum()), title="Total Prediction on the overlap time values",
-                             extra=a(href=True)),]
-                    )
+                    Space(
+                        [
+                            Card(
+                                np.round(y_true.loc[test_index].sum()),
+                                title="Total Purchase on the overlap time values",
+                                extra=a(href=True),
+                            ),
+                            Card(
+                                np.round(y_pred.loc[test_index].sum()),
+                                title="Total Prediction on the overlap time values",
+                                extra=a(href=True),
+                            ),
+                        ]
+                    ),
                 ]
             )
 
     def specific_graph(self):
-        if not all((self.model(), self.database(), self.date(), self.input_number(),self.col_option())):
+        if not all(
+            (
+                self.model(),
+                self.database(),
+                self.date(),
+                self.input_number(),
+                self.col_option(),
+            )
+        ):
             return
         else:
             data = pd.read_csv(os.path.join(DATA_FOLDER, self.database() + ".csv"))
@@ -188,9 +244,9 @@ class Application:
 
             N = int(self.input_number())
             data, dff, dffm = MODELS[self.model()](data, date, int(self.input_number()))
-            data=data[self.col_option()]
-            dff=dff[self.col_option()+"_"+self.model()]
-            dffm=dffm[self.col_option()+"_error_"+self.model()]
+            data = data[self.col_option()]
+            dff = dff[self.col_option() + "_" + self.model()]
+            dffm = dffm[self.col_option() + "_error_" + self.model()]
 
             y_true = data
             y_pred = dff
@@ -198,9 +254,8 @@ class Application:
             y_true.index.name = None
 
             df = pd.concat([y_true, y_pred], axis=1)
-            df.columns = ['Purchase', 'Predicted']
-            fig = px.line(df,
-                          y=['Purchase', 'Predicted'])
+            df.columns = ["Purchase", "Predicted"]
+            fig = px.line(df, y=["Purchase", "Predicted"])
             fig.update_layout(
                 title="Evolution of the total",
                 xaxis_title="Date",
@@ -211,7 +266,10 @@ class Application:
             test_index = test_index[test_index <= y_true.index.max()]
             test_index.freq = None
             test_index = pd.DatetimeIndex(test_index)
-            diff = abs(y_pred.loc[test_index] - y_true.loc[test_index]) / y_true.loc[test_index]
+            diff = (
+                abs(y_pred.loc[test_index] - y_true.loc[test_index])
+                / y_true.loc[test_index]
+            )
             fig_error = px.bar(diff)
             fig_error.update_layout(
                 title="Evolution of the absolute percent error",
@@ -222,17 +280,26 @@ class Application:
                 [
                     Space(Graph(fig)),
                     Space(Graph(fig_error)),
-                    Space([Card(np.round(y_true.loc[test_index].sum()), title="Total Purchase on the overlap time values",
-                                extra=a(href=True)),
-                           Card(np.round(y_pred.loc[test_index].sum()), title="Total Prediction on the overlap time values",
-                                extra=a(href=True)), ]
-                          )
+                    Space(
+                        [
+                            Card(
+                                np.round(y_true.loc[test_index].sum()),
+                                title="Total Purchase on the overlap time values",
+                                extra=a(href=True),
+                            ),
+                            Card(
+                                np.round(y_pred.loc[test_index].sum()),
+                                title="Total Prediction on the overlap time values",
+                                extra=a(href=True),
+                            ),
+                        ]
+                    ),
                 ]
             )
 
 
 def app():
-    application  = Application()
+    application = Application()
     return div(
         [
             h1("Time Series Forecasting"),
@@ -243,6 +310,5 @@ def app():
             Space([application.generic_graph]),
             Space([application.col_option]),
             Space([application.specific_graph]),
-
         ]
     )
