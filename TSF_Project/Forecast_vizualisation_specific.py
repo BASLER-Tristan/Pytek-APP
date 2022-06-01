@@ -65,7 +65,7 @@ class Application:
         self.input_number = InputNumber(min=1)
 
         self.col_option = Select(
-            children=[Option(key, key=key) for key in data_columns["data_WN"]],
+            children=[Option(key, key=key) for key in data_columns["data_specific"]],
             allowClear=True,
             style=dict(width="100%"),
             placeholder="Please select your product",
@@ -257,7 +257,7 @@ class Application:
             df.columns = ["Purchase", "Predicted"]
             fig = px.line(df, y=["Purchase", "Predicted"])
             fig.update_layout(
-                title="Evolution of the total",
+                title="Evolution of the purchase",
                 xaxis_title="Date",
                 yaxis_title="Volume",
             )

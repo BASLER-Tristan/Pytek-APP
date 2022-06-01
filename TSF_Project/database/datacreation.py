@@ -12,12 +12,14 @@ K is the number of month to generate. The first month is always January 2010.
 """
 ##################################################################################
 
+### Importation
+import os
 import random
 import numpy as np
 import pandas as pd
+from statsmodels.tsa.arima.model import ARIMA
 import string
 from os.path import join
-
 
 database_explanation = {
     "data_YI": "a white noise for every year with a mean value for the first year and increase by 20% each year and a standard deviation of 4",
@@ -33,10 +35,8 @@ for name, description in database_explanation.items():
     data.drop(columns="Unnamed: 0", inplace=True)
     data_columns[name] = data.columns
 
-
 def save_data(data, name):
     data.to_csv(join("TSF_Project", "database", f"data_{name}.csv"))
-
 
 ########################## Data Creation ##########################
 if __name__ == "__main__":
@@ -80,8 +80,8 @@ if __name__ == "__main__":
         mean = random.randint(10, 50)
         std = 4
         samples = np.random.normal(mean, std, size=12 * K)
-        row = np.array([i for i in range(K * 12)])
-        row = row + samples
+        row = np.array([i for i in range(K*12)])
+        row= row + samples
         data.append(row)
 
     cols = np.transpose(data)
@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
     save_data(data, "WN")
 
-    ### Creation of the white noise data
+    ### Creation of the random data
     N = 10
     K = 10
     data = []
@@ -155,3 +155,51 @@ if __name__ == "__main__":
     data.columns = list_product
 
     save_data(data, "R")
+
+    db=[]
+    name=[]
+
+    # rectangular data
+    P = 3
+    Nr = 5
+    for i in range(Nr):
+        base = np.random.randint(20, 80, size=int(12 * K / P))
+        col = []
+        for e in base:
+            col = col + [e] * P
+        db.append(col)
+        name.append("Rect {}".format(i))
+
+    # triangular data
+    P = 6
+    Nt = 5
+    for i in range(Nt):
+        base = np.random.randint(20, 80, size=int(12 * K / P) + 1)
+        col = []
+        for i in range(int(12 * K / P)):
+            col = col + [base[i] + j * (base[i + 1] - base[i]) / P for j in range(P)]
+        db.append(col)
+        name.append('Triangular {}'.format(i))
+
+    # sinus cosinus data
+    P = 3
+    Nsc = 5
+    for i in range(Nsc):
+        col1 = []
+        col2 = []
+        for j in range(K*12):
+            col1.append(np.cos(2*np.pi*j/P+random.random()/10)+3)
+            col2.append(np.sin(2*np.pi*j/P+random.random()/10)+3)
+        db.append(col1)
+        name.append("Cos {}".format(i))
+        db.append(col2)
+        name.append("Sinus {}".format(i))
+
+    data=pd.DataFrame(db)
+    data=data.transpose()
+    data.columns=name
+    start = "2010-01-01"
+    end = "2019-12-31"
+
+    data.index = pd.date_range(start, end, freq="MS")
+    save_data(data, "specific")

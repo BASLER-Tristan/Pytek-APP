@@ -10,7 +10,7 @@ You can find the model :
     * SARIMA : Seasonal Autoregressive Integrated Moving - Average,
     * VAR : Vector Autoregression,
     * VARMA : Vector Autoregression Moving-Average,
-    * SES : Simple Exponential Smoothing,"
+    * SES : Simple Exponential Smoothing,
     * HWES : Holt Winter’s Exponential Smoothing,
 
 The result of each function are :
