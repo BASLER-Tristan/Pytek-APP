@@ -2,3 +2,4 @@ mistletoe
 pandas
 plotly
 statsmodels
+xgboost

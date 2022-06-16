@@ -22,6 +22,7 @@ The result of each function are :
 
 ### Importation
 import pandas as pd
+import xgboost
 from statsmodels.tsa.ar_model import AutoReg
 from statsmodels.tsa.arima.model import ARIMA
 from statsmodels.tsa.statespace.sarimax import SARIMAX
@@ -29,6 +30,8 @@ from statsmodels.tsa.vector_ar.var_model import VAR
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import numpy as np
+import XGBOOST_forecasting as xgbf
+
 
 ### Model Predict definition
 def AR_predict(data, date, N):
@@ -62,6 +65,7 @@ def AR_predict(data, date, N):
     dffm = pd.DataFrame(metrics, columns=col_name_metrics, index=index)
     data = data[data.index < date_f]
     return data, dff, dffm
+
 
 def MA_predict(data, date, N):
     "Moving average"
@@ -98,6 +102,7 @@ def MA_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
+
 def ARMA_predict(data, date, N):
     """Autoregressive–moving-average model"""
     cols = []
@@ -132,6 +137,7 @@ def ARMA_predict(data, date, N):
     dffm = pd.DataFrame(metrics, columns=col_name_metrics, index=index)
     data = data[data.index < date_f]
     return data, dff, dffm
+
 
 def ARIMA_predict(data, date, N):
     "Autoregressive Integrated Moving Average"
@@ -168,6 +174,7 @@ def ARIMA_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
+
 def SARIMA_predict(data, date, N):
     "Seasonal Autoregressive Integrated Moving Average"
     cols = []
@@ -203,6 +210,7 @@ def SARIMA_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
+
 def VAR_predict(data, date, N):
     "Vector Autoregression"
     data_train = data[data.index < date]
@@ -224,6 +232,7 @@ def VAR_predict(data, date, N):
     dffm.columns = [col + "_error_VAR" for col in data_test.columns]
     data = data[data.index < date_f]
     return data, dff, dffm
+
 
 def SES_predict(data, date, N):
     "Simple Exponential Smoothing"
@@ -260,6 +269,7 @@ def SES_predict(data, date, N):
     data = data[data.index < date_f]
     return data, dff, dffm
 
+
 def HWES_predict(data, date, N):
     "Holt Winter’s Exponential Smoothing"
     cols = []
@@ -295,6 +305,23 @@ def HWES_predict(data, date, N):
     dffm = pd.DataFrame(metrics, columns=col_name_metrics, index=index)
     data = data[data.index < date_f]
     return data, dff, dffm
+
+
+def xgboost_predict(data, date, nb_prediction):
+    res = xgbf.pipeline(data,
+                        size_rolling_windows=12)
+    model = xgboost.XGBRegressor()
+    model = xgbf.fit_model(model,
+                           res,
+                           date)
+    data, dff, dffm = xgbf.result_pipeline(model,
+                                           res,
+                                           date,
+                                           nb_prediction,
+                                           size_rolling_windows=12
+                                           )
+    return data, dff, dffm
+
 
 ### Vectorization
 MODELS = {
