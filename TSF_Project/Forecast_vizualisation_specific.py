@@ -321,9 +321,7 @@ def app():
     application = Application()
     return div(
         [
-            h1("Time Series Forecasting"),
             Space([application.database]),
-            Space([application.explanation]),
             Space([application.model]),
             Space([application.date, application.input_number]),
             Space([application.generic_graph]),
