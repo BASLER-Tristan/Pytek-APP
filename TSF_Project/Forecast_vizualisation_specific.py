@@ -273,6 +273,7 @@ class Application:
 
             df = pd.concat([y_true, y_pred], axis=1)
             df.columns = ["Purchase", "Predicted"]
+            df = df.astype(float)
             fig = px.line(df, y=["Purchase", "Predicted"])
             fig.update_layout(
                 title="Evolution of the purchase",
@@ -301,12 +302,12 @@ class Application:
                     Space(
                         [
                             Card(
-                                np.round(y_true.loc[test_index].sum()),
+                                int(np.round(y_true.loc[test_index].sum())),
                                 title="Total Purchase on the overlap time values",
                                 extra=a(href=True),
                             ),
                             Card(
-                                np.round(y_pred.loc[test_index].sum()),
+                                int(np.round(y_pred.loc[test_index].sum())),
                                 title="Total Prediction on the overlap time values",
                                 extra=a(href=True),
                             ),

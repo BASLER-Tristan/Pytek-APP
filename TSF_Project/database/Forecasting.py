@@ -30,7 +30,7 @@ from statsmodels.tsa.vector_ar.var_model import VAR
 from statsmodels.tsa.holtwinters import SimpleExpSmoothing
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 import numpy as np
-import XGBOOST_forecasting as xgbf
+import TSF_Project.database.XGBOOST_forecasting as xgbf
 
 
 ### Model Predict definition
@@ -316,6 +316,7 @@ def xgboost_predict(data, date, nb_prediction):
                            date)
     data, dff, dffm = xgbf.result_pipeline(model,
                                            res,
+                                           data,
                                            date,
                                            nb_prediction,
                                            size_rolling_windows=12
