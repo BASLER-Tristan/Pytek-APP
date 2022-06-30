@@ -117,12 +117,11 @@ def result_pipeline(model, res, data, date, nb_prediction, size_rolling_windows=
     dffm = (data_past - past_prediction) ** 2
 
     ### future data
-    list_index = list(data_past.index)
-    input = data_past.loc[list_index[-12:]]
     init_date = date
     init_month = init_date.month
     init_year = init_date.year
     for i in range(nb_prediction):
+        list_index = list(data_past.index)
         dfx = data_past.loc[list_index[-12:]].transpose()
         dfx.columns = [
             "M -12",

@@ -330,3 +330,12 @@ MODELS = {
     for name, value in globals().items()
     if name.endswith("_predict")
 }
+
+if __name__ == '__main__':
+    data = pd.read_csv('database/data_R.csv')
+    data.set_index(pd.to_datetime(data["Unnamed: 0"]), inplace=True)
+    data.drop(columns="Unnamed: 0", inplace=True)
+    date = pd.to_datetime('2018-01-01')
+    N = 40
+    xx, yx, zx = xgboost_predict(data, date, N)
+    print('End')
