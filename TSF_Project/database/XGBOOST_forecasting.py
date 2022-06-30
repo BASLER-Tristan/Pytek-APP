@@ -111,10 +111,7 @@ def result_pipeline(model, res, data, date, nb_prediction, size_rolling_windows=
             result_on_training[2].str.startswith(product)
         ].reset_index()[0]
     past_prediction.index = date_scale.unique()
-
-    ### metrics
-    data_past = data[data.index <= date]
-    dffm = (data_past - past_prediction) ** 2
+    data_past = data[data.index < date]
 
     ### future data
     init_date = date
@@ -153,6 +150,12 @@ def result_pipeline(model, res, data, date, nb_prediction, size_rolling_windows=
     dff = pd.concat(
         [past_prediction, data_past[data_past.index > past_prediction.index.max()]]
     )
+
+    ### metrics
+    data = data[data.index <= date + pd.DateOffset(months=nb_prediction)]
+    dffm = (data - dff) ** 2
+    dffm.dropna(inplace=True)
+
     dff.columns = [col + "_xgboost" for col in data.columns]
     dffm.columns = [col + "_error_xgboost" for col in data.columns]
 

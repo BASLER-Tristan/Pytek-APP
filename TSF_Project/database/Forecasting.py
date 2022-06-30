@@ -33,6 +33,9 @@ import numpy as np
 import TSF_Project.database.XGBOOST_forecasting as xgbf
 
 
+# import database.XGBOOST_forecasting as xgbf
+
+
 ### Model Predict definition
 def AR_predict(data, date, N):
     """Auto regressive"""
@@ -310,6 +313,9 @@ def HWES_predict(data, date, N):
 def xgboost_predict(data, date, nb_prediction):
     res = xgbf.pipeline(data,
                         size_rolling_windows=12)
+    res = res[res.date <= date]
+    data = data[data.index <= date + pd.DateOffset(months=nb_prediction)]
+
     model = xgboost.XGBRegressor()
     model = xgbf.fit_model(model,
                            res,
@@ -332,10 +338,10 @@ MODELS = {
 }
 
 if __name__ == '__main__':
-    data = pd.read_csv('database/data_R.csv')
+    data = pd.read_csv('database/data_specific.csv')
     data.set_index(pd.to_datetime(data["Unnamed: 0"]), inplace=True)
     data.drop(columns="Unnamed: 0", inplace=True)
     date = pd.to_datetime('2018-01-01')
-    N = 40
+    N = 10
     xx, yx, zx = xgboost_predict(data, date, N)
     print('End')

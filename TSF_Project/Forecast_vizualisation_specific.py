@@ -188,7 +188,7 @@ class Application:
             data.drop(columns="Unnamed: 0", inplace=True)
 
             date = pd.to_datetime(self.date())
-            date = datetime(date.year, date.month, date.day)
+            date = datetime(date.year, date.month, 1)
 
             N = int(self.input_number())
             data, dff, dffm = MODELS[self.model()](data, date, int(self.input_number()))
@@ -258,13 +258,12 @@ class Application:
             data.drop(columns="Unnamed: 0", inplace=True)
 
             date = pd.to_datetime(self.date())
-            date = datetime(date.year, date.month, date.day)
+            date = datetime(date.year, date.month, 1)
 
             N = int(self.input_number())
             data, dff, dffm = MODELS[self.model()](data, date, int(self.input_number()))
             data = data[self.col_option()]
             dff = dff[self.col_option() + "_" + self.model()]
-            dffm = dffm[self.col_option() + "_error_" + self.model()]
 
             y_true = data
             y_pred = dff
@@ -289,6 +288,7 @@ class Application:
                     abs(y_pred.loc[test_index] - y_true.loc[test_index])
                     / y_true.loc[test_index]
             )
+            diff = diff.astype(float)
             fig_error = px.bar(diff)
             fig_error.update_layout(
                 title="Evolution of the absolute percent error",
